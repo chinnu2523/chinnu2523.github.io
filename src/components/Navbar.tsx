@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <kbd className="text-[10px] text-slate-500 dark:text-slate-400">⌘K</kbd>
           </button>
 
-          {/* Primary Royal CV Glass/White Pill */}
+          {/* Primary CV Button */}
           <button
             onClick={() => {
               sounds.playSuccess();
@@ -139,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center space-x-1.5 px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs font-semibold text-white dark:text-black bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-neutral-200 shadow-md shadow-black/10 dark:shadow-white/20 transition-all font-mono active:scale-95"
           >
             <Lock className="w-3 h-3 text-white dark:text-black" />
-            <span>Royal CV</span>
+            <span>CV</span>
           </button>
 
           {/* Mobile Menu Toggle Button */}

@@ -254,7 +254,7 @@ export const InteractiveTerminal: React.FC = () => {
             <div className="text-slate-400">EDUCATION: BCA @ KL University (2023-2026, CGPA: 8.7)</div>
             <div className="text-slate-400">INTERNSHIPS: Edufyi Tech Solutions, Corizo, Skill Dunia</div>
             <div className="text-slate-400">CERTS: Aviatrix ACE, Google Cybersecurity, Red Team CTIGA/CCEP, CCSC, ISC2 CC</div>
-            <div className="text-white font-semibold mt-2">[End of File - Click 'Royal CV' in navbar to view or print full CV]</div>
+            <div className="text-white font-semibold mt-2">[End of File - Click 'CV' in navbar to view or print full CV]</div>
           </div>
         )
       });
