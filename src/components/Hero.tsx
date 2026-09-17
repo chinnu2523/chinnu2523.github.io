@@ -90,22 +90,56 @@ const photoTotalY = useTransform(
 const badgeTranslateX = useSpring(useTransform(mouseX, [-0.5, 0.5], [18, -18]), { stiffness: 190, damping: 18 });
 const badgeTranslateY = useSpring(useTransform(mouseY, [-0.5, 0.5], [18, -18]), { stiffness: 190, damping: 18 });
 
+const [isDesktop, setIsDesktop] = React.useState(false);
+
+React.useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check, { passive: true });
+    return () => window.removeEventListener('resize', check);
+  }
+}, []);
+
+const activeLeftWingStyle = isDesktop ? { x: leftWingX, opacity: leftWingOpacity } : undefined;
+const activeRightWingStyle = isDesktop ? { x: rightWingX, opacity: rightWingOpacity } : undefined;
+const activePhotoStyle = isDesktop ? {
+  scale: photoScale,
+  opacity: photoOpacity,
+  rotateX: photoRotateX, 
+  rotateY: photoRotateY, 
+  x: photoTranslateX,
+  y: photoTotalY,
+  transformOrigin: '50% 10%',
+  transformStyle: 'preserve-3d' as const
+} : undefined;
+const activeBadgeStyle = isDesktop ? {
+  x: badgeTranslateX,
+  y: badgeTranslateY,
+  scale: badgesScale,
+  opacity: badgesOpacity
+} : undefined;
+const activeOrbitStyle = isDesktop ? { scale: orbitScale, opacity: orbitOpacity } : undefined;
+const activeHaloStyle = isDesktop ? { scale: haloScale, opacity: haloOpacity } : undefined;
+
 const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  if (!isDesktop) return;
   mouseX.set((e.clientX - window.innerWidth / 2) / window.innerWidth);
   mouseY.set((e.clientY - window.innerHeight / 2) / window.innerHeight);
 };
 
 const handleMouseLeave = () => {
-mouseX.set(0);
-mouseY.set(0);
+  if (!isDesktop) return;
+  mouseX.set(0);
+  mouseY.set(0);
 };
 
 const scrollToSection = (id: string) => {
-sounds.playKeyClick();
-const element = document.getElementById(id);
-if (element) {
-element.scrollIntoView({ behavior: 'smooth' });
-}
+  sounds.playKeyClick();
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
 };
 
 // Staggered Entrance Variants
@@ -121,29 +155,28 @@ delayChildren: 0.08
 };
 
 const itemVariants: Variants = {
-hidden: { opacity: 0, y: 22, filter: 'blur(6px)' },
-visible: {
-opacity: 1,
-y: 0,
-filter: 'blur(0px)',
-transition: {
-duration: 0.85,
-ease: LUXURY_EASE
-}
-}
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.75,
+      ease: LUXURY_EASE
+    }
+  }
 };
 
   return (
     <div 
       ref={containerRef}
       id="overview"
-      className="relative h-[200vh] bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-white selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300"
+      className="relative min-h-screen lg:h-[200vh] bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-white selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300"
     >
-      {/* Sticky Full-Viewport Stage */}
+      {/* Viewport Stage: Natural Flowing on Mobile, Sticky Zoom on Desktop */}
       <section 
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="sticky top-0 h-screen w-full flex flex-col justify-between pt-20 sm:pt-24 pb-6 sm:pb-8 overflow-hidden bg-[#F8FAFC] dark:bg-black transition-colors duration-300"
+        className="relative lg:sticky lg:top-0 min-h-screen lg:h-screen w-full flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-8 overflow-visible lg:overflow-hidden bg-[#F8FAFC] dark:bg-black transition-colors duration-300"
       >
         {/* Ambient Studio Spotlight with Live Breathing & Scroll Expansion */}
         <div className="absolute inset-0 pointer-events-none z-0">
@@ -177,28 +210,30 @@ ease: LUXURY_EASE
           />
         </div>
 
-        {/* Cinematic HUD Title Overlay (Reveals during scroll-driven center zoom) */}
-        <motion.div 
-          style={{ 
-            opacity: cinematicHudOpacity, 
-            y: cinematicHudY, 
-            scale: cinematicHudScale 
-          }}
-          className="absolute inset-x-0 bottom-14 sm:bottom-18 z-30 flex flex-col items-center justify-center text-center pointer-events-none px-4"
-        >
-          <div className="px-5 py-2.5 rounded-full bg-white/90 dark:bg-black/85 border border-slate-300 dark:border-white/30 backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center space-x-3">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 dark:bg-white opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900 dark:bg-white" />
-            </span>
-            <span className="font-mono text-xs sm:text-sm tracking-[0.25em] text-slate-900 dark:text-white uppercase font-bold">
-              VEERA GURU DATTA SRINIDHI VISAKA
-            </span>
-          </div>
-          <p className="mt-3 text-xs sm:text-sm font-royal italic text-slate-600 dark:text-slate-300 tracking-wide max-w-lg">
-            Offensive Security Architect &amp; Multi-Cloud Specialist • KL University BCA Scholar (8.7 CGPA)
-          </p>
-        </motion.div>
+        {/* Cinematic HUD Title Overlay (Reveals during scroll-driven center zoom on desktop) */}
+        {isDesktop && (
+          <motion.div 
+            style={{ 
+              opacity: cinematicHudOpacity, 
+              y: cinematicHudY, 
+              scale: cinematicHudScale 
+            }}
+            className="absolute inset-x-0 bottom-14 sm:bottom-18 z-30 flex flex-col items-center justify-center text-center pointer-events-none px-4"
+          >
+            <div className="px-5 py-2.5 rounded-full bg-white/90 dark:bg-black/85 border border-slate-300 dark:border-white/30 backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.15)] flex items-center space-x-3">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 dark:bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-900 dark:bg-white" />
+              </span>
+              <span className="font-mono text-xs sm:text-sm tracking-[0.25em] text-slate-900 dark:text-white uppercase font-bold">
+                VEERA GURU DATTA SRINIDHI VISAKA
+              </span>
+            </div>
+            <p className="mt-3 text-xs sm:text-sm font-royal italic text-slate-600 dark:text-slate-300 tracking-wide max-w-lg">
+              Offensive Security Architect &amp; Multi-Cloud Specialist • KL University BCA Scholar (8.7 CGPA)
+            </p>
+          </motion.div>
+        )}
 
         {/* Main Tri-Fold Composition: Left Details | Centered Zooming Photo | Right Details */}
         <div className="relative z-10 site-container w-full max-w-7xl mx-auto px-4 sm:px-8 my-auto">
@@ -206,7 +241,7 @@ ease: LUXURY_EASE
 
             {/* WING 1 (Left 4 Cols): Identity, Editorial Headline & Primary Directives */}
             <motion.div 
-              style={{ x: leftWingX, opacity: leftWingOpacity }}
+              style={activeLeftWingStyle}
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -311,20 +346,11 @@ ease: LUXURY_EASE
 
             {/* CENTER STAGE (Center 4 Cols): Majestic Sovereign Portrait with Living Orbit & Scroll Zoom */}
             <motion.div 
-              style={{ 
-                scale: photoScale,
-                opacity: photoOpacity,
-                rotateX: photoRotateX, 
-                rotateY: photoRotateY, 
-                x: photoTranslateX,
-                y: photoTotalY,
-                transformOrigin: '50% 10%',
-                transformStyle: 'preserve-3d' 
-              }}
+              style={activePhotoStyle}
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.1, ease: LUXURY_EASE }}
-              className="col-span-1 lg:col-span-4 relative flex justify-center items-center perspective-1000 select-none my-4 lg:my-0 z-10"
+              className="col-span-1 lg:col-span-4 relative flex justify-center items-center perspective-1000 select-none my-6 lg:my-0 z-10"
             >
               {/* Soft Ambient Breathing Backing Behind Subject */}
               <motion.div 
@@ -342,15 +368,15 @@ ease: LUXURY_EASE
 
               {/* Living Orbital Concentric Cyber Rings (3-Tier Tourbillon Complication) */}
               <motion.div 
-                style={{ scale: orbitScale, opacity: orbitOpacity }}
+                style={activeOrbitStyle}
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
               >
                 {/* Ring 1: Outer Slow-Rotating Orbit with 4 Cardinal Specular Satellites */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 55, repeat: Infinity, ease: 'linear' }}
-                  style={{ rotate: orbitScrollRotate }}
-                  className="w-[390px] sm:w-[450px] xl:w-[480px] h-[390px] sm:h-[450px] xl:h-[480px] rounded-full border border-slate-300/80 dark:border-white/15 relative"
+                  style={isDesktop ? { rotate: orbitScrollRotate } : undefined}
+                  className="w-[280px] sm:w-[420px] xl:w-[480px] h-[280px] sm:h-[420px] xl:h-[480px] rounded-full border border-slate-300/80 dark:border-white/15 relative"
                 >
                   {/* Cardinal Orbit Nodes at 0°, 90°, 180°, 270° */}
                   <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-slate-900 dark:bg-white shadow-[0_0_14px_rgba(15,23,42,0.4)] dark:shadow-[0_0_14px_#ffffff]" />
@@ -363,14 +389,14 @@ ease: LUXURY_EASE
                 <motion.div
                   animate={{ rotate: -360 }}
                   transition={{ duration: 38, repeat: Infinity, ease: 'linear' }}
-                  className="absolute w-[330px] sm:w-[380px] xl:w-[410px] h-[330px] sm:h-[380px] xl:h-[410px] rounded-full border border-dashed border-slate-300/60 dark:border-white/20"
+                  className="absolute w-[240px] sm:w-[360px] xl:w-[410px] h-[240px] sm:h-[360px] xl:h-[410px] rounded-full border border-dashed border-slate-300/60 dark:border-white/20"
                 />
 
                 {/* Ring 3: Inner Precision Reticle Ring with Crosshair Accents */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-                  className="absolute w-[270px] sm:w-[310px] xl:w-[330px] h-[270px] sm:h-[310px] xl:h-[330px] rounded-full border border-slate-300/40 dark:border-white/10"
+                  className="absolute w-[200px] sm:w-[290px] xl:w-[330px] h-[200px] sm:h-[290px] xl:h-[330px] rounded-full border border-slate-300/40 dark:border-white/10"
                 >
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 border-t border-slate-400/60 dark:border-white/40" />
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 border-b border-slate-400/60 dark:border-white/40" />
@@ -384,7 +410,7 @@ ease: LUXURY_EASE
                 id="hero-portrait"
                 data-cursor="portrait"
                 data-cursor-text="BIOMETRIC // VERIFIED"
-                className="relative w-full max-w-[320px] sm:max-w-[360px] xl:max-w-[400px] aspect-[62/100] flex items-center justify-center group"
+                className="relative w-full max-w-[260px] sm:max-w-[340px] xl:max-w-[400px] aspect-[62/100] flex items-center justify-center group"
               >
                 <img 
                   src={PERSONAL_INFO.avatarUrl} 
@@ -395,12 +421,7 @@ ease: LUXURY_EASE
 
                 {/* Floating Satellite Badge 1: Top Right (KL University BCA Scholar) */}
                 <motion.div
-                  style={{ 
-                    x: badgeTranslateX, 
-                    y: badgeTranslateY,
-                    scale: badgesScale,
-                    opacity: badgesOpacity
-                  }}
+                  style={activeBadgeStyle}
                   animate={{ y: [-3, 3, -3] }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                   className="absolute -top-2 -right-2 sm:-right-4 px-3 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 flex items-center space-x-2"
@@ -412,12 +433,7 @@ ease: LUXURY_EASE
 
                 {/* Floating Satellite Badge 2: Bottom Left (Aviatrix Multicloud ACE) */}
                 <motion.div
-                  style={{ 
-                    x: badgeTranslateX, 
-                    y: badgeTranslateY,
-                    scale: badgesScale,
-                    opacity: badgesOpacity
-                  }}
+                  style={activeBadgeStyle}
                   animate={{ y: [3, -3, 3] }}
                   transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
                   className="absolute -bottom-2 -left-2 sm:-left-4 px-3 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 flex items-center space-x-2"
@@ -428,10 +444,7 @@ ease: LUXURY_EASE
 
                 {/* Floating Frosted Cryptographic Keypair Anchor Badge */}
                 <motion.div 
-                  style={{ 
-                    scale: badgesScale,
-                    opacity: badgesOpacity
-                  }}
+                  style={activeBadgeStyle}
                   animate={{ y: [-2, 2, -2] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                   className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 whitespace-nowrap"
@@ -449,7 +462,7 @@ ease: LUXURY_EASE
 
             {/* WING 2 (Right 4 Cols): Editorial Proof Annotations & Strategic Metrics */}
             <motion.div 
-              style={{ x: rightWingX, opacity: rightWingOpacity }}
+              style={activeRightWingStyle}
               initial={{ opacity: 0, x: 25 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.85, delay: 0.18, ease: LUXURY_EASE }}
@@ -525,8 +538,8 @@ ease: LUXURY_EASE
 
         {/* Classic Minimalist Anchor Bar with Dynamic Scroll Flow Guide */}
         <motion.div 
-          style={{ opacity: bottomBarOpacity }}
-          className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-8 pt-4 sm:pt-6 border-t border-slate-200 dark:border-white/10 flex items-center justify-between"
+          style={isDesktop ? { opacity: bottomBarOpacity } : undefined}
+          className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-8 pt-4 sm:pt-6 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left mt-8 lg:mt-0"
         >
           {/* Left: Classic Authority Line */}
           <div className="font-mono text-[9.5px] sm:text-[10.5px] tracking-widest text-slate-500 dark:text-slate-400 uppercase">
@@ -538,7 +551,7 @@ ease: LUXURY_EASE
             onClick={() => scrollToSection('experience')}
             className="inline-flex items-center space-x-2.5 text-xs font-mono text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors duration-300 group"
           >
-            <span className="tracking-widest uppercase text-[10.5px]">Scroll to Zoom &amp; Explore</span>
+            <span className="tracking-widest uppercase text-[10.5px]">{isDesktop ? 'Scroll to Zoom & Explore' : 'Scroll to Explore'}</span>
             <div className="w-6 h-6 rounded-full border border-slate-300 dark:border-white/20 flex items-center justify-center group-hover:border-slate-600 dark:group-hover:border-white group-hover:bg-black/5 dark:group-hover:bg-white/10 transition-all">
               <motion.div
                 animate={{ y: [-2, 3, -2] }}

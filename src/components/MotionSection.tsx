@@ -19,11 +19,11 @@ export const MotionSection: React.FC<MotionSectionProps> = ({
   return (
     <motion.section
       id={id}
-      initial={{ opacity: 0, y: 35, filter: 'blur(6px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, margin: '-70px' }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
       transition={{
-        duration: 0.75,
+        duration: 0.65,
         delay,
         ease: [0.16, 1, 0.3, 1]
       }}

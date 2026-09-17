@@ -18,6 +18,17 @@ import { ScrollProgressBeam } from './components/ScrollProgressBeam';
 export const AppContent: React.FC = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [hasFinePointer, setHasFinePointer] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const mq = window.matchMedia('(pointer: fine)');
+      setHasFinePointer(mq.matches);
+      const handler = (e: MediaQueryListEvent) => setHasFinePointer(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    }
+  }, []);
 
   const scrollToTerminal = () => {
     const el = document.getElementById('terminal');
@@ -27,7 +38,7 @@ export const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-[#e1e2e7] bg-tactical-grid bg-emissive-glow overflow-x-clip selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+    <div className="relative min-h-screen bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-[#e1e2e7] bg-tactical-grid bg-emissive-glow overflow-x-hidden selection:bg-slate-900 selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
       
       {/* Liquid Platinum Scroll Progress Hairline Beam */}
       <ScrollProgressBeam />
@@ -35,8 +46,8 @@ export const AppContent: React.FC = () => {
       {/* High-Performance Canvas Cyber Background with Data Mesh */}
       <CyberBackground />
 
-      {/* Cyber Reticle Cursor with Smooth Spring Physics */}
-      <CustomCursor />
+      {/* Cyber Reticle Cursor with Smooth Spring Physics (Desktop Fine Pointers Only) */}
+      {hasFinePointer && <CustomCursor />}
 
       {/* Top Navigation */}
       <Navbar

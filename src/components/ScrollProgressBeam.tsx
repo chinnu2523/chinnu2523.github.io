@@ -9,14 +9,6 @@ export const ScrollProgressBeam: React.FC = () => {
     restDelta: 0.001
   });
 
-  const [percentage, setPercentage] = useState(0);
-
-  useEffect(() => {
-    return scrollYProgress.on('change', (latest) => {
-      setPercentage(Math.round(latest * 100));
-    });
-  }, [scrollYProgress]);
-
   return (
     /* Liquid Platinum Hairline Progress Beam at Top */
     <div className="fixed top-0 left-0 right-0 z-[100] h-[2px] bg-slate-200 dark:bg-black pointer-events-none transition-colors">

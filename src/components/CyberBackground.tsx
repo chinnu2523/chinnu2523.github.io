@@ -47,8 +47,10 @@ export const CyberBackground: React.FC = () => {
     const particles: Particle[] = [];
     const packets: Packet[] = [];
     
-    // Optimized node count: 36 on widescreen, 18 on small devices (zero lag)
-    const particleCount = Math.min(Math.floor((width * height) / 36000), 38);
+    const isMobile = window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches;
+    
+    // Optimized node count: 38 on desktop, 10 on mobile
+    const particleCount = isMobile ? 10 : Math.min(Math.floor((width * height) / 36000), 38);
     // Dark & Light Palettes
     const darkColors = ['#FFFFFF', '#E2E8F0', '#CBD5E1', '#94A3B8', '#64748B'];
     const lightColors = ['#0F172A', '#1E293B', '#334155', '#475569', '#64748B'];
@@ -59,21 +61,21 @@ export const CyberBackground: React.FC = () => {
       particles.push({
         x: px,
         y: py,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.8 + 0.9,
-        alpha: Math.random() * 0.45 + 0.25,
+        vx: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
+        vy: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
+        size: Math.random() * 1.6 + 0.8,
+        alpha: Math.random() * 0.4 + 0.2,
         colorDark: darkColors[Math.floor(Math.random() * darkColors.length)],
         colorLight: lightColors[Math.floor(Math.random() * lightColors.length)],
         pulsePhase: Math.random() * Math.PI * 2
       });
     }
 
-
     let mouseX = -1000;
     let mouseY = -1000;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMobile) return;
       mouseX = e.clientX;
       mouseY = e.clientY;
     };
@@ -84,78 +86,94 @@ export const CyberBackground: React.FC = () => {
       height = canvas.height = window.innerHeight;
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    let isScrolling = false;
+    let scrollTimer: any = null;
+    const handleScroll = () => {
+      isScrolling = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isScrolling = false;
+      }, 100);
+    };
+
+    if (!isMobile) {
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    }
     window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     let packetTimer = 0;
 
     const render = () => {
-      if (document.hidden) {
+      if (document.hidden || (isMobile && isScrolling)) {
         animationFrameId = requestAnimationFrame(render);
         return;
       }
 
       ctx.clearRect(0, 0, width, height);
 
-      const maxDistance = 140;
-      const maxDistanceSq = maxDistance * maxDistance;
+      const dark = isDarkRef.current;
       const activeEdges: [number, number][] = [];
 
-      // Draw constellation lines with fast squared distance comparison
-      const dark = isDarkRef.current;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distSq = dx * dx + dy * dy;
+      // Only calculate & draw constellation lines and telemetry packets on desktop
+      if (!isMobile) {
+        const maxDistance = 140;
+        const maxDistanceSq = maxDistance * maxDistance;
 
-          if (distSq < maxDistanceSq) {
-            const dist = Math.sqrt(distSq);
-            activeEdges.push([i, j]);
-            const alpha = (1 - dist / maxDistance) * 0.14;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = dark ? `rgba(255, 255, 255, ${alpha})` : `rgba(15, 23, 42, ${alpha * 0.9})`;
-            ctx.lineWidth = 0.65;
-            ctx.stroke();
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < maxDistanceSq) {
+              const dist = Math.sqrt(distSq);
+              activeEdges.push([i, j]);
+              const alpha = (1 - dist / maxDistance) * 0.14;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = dark ? `rgba(255, 255, 255, ${alpha})` : `rgba(15, 23, 42, ${alpha * 0.9})`;
+              ctx.lineWidth = 0.65;
+              ctx.stroke();
+            }
           }
         }
-      }
 
-      // Telemetry packet transmission along edges
-      packetTimer++;
-      if (packetTimer % 45 === 0 && activeEdges.length > 0 && packets.length < 5) {
-        const edge = activeEdges[Math.floor(Math.random() * activeEdges.length)];
-        packets.push({
-          fromIdx: edge[0],
-          toIdx: edge[1],
-          progress: 0,
-          speed: 0.014 + Math.random() * 0.016
-        });
-      }
-
-      // Update packets
-      for (let k = packets.length - 1; k >= 0; k--) {
-        const pkt = packets[k];
-        pkt.progress += pkt.speed;
-
-        if (pkt.progress >= 1) {
-          packets.splice(k, 1);
-          continue;
+        // Telemetry packet transmission along edges
+        packetTimer++;
+        if (packetTimer % 45 === 0 && activeEdges.length > 0 && packets.length < 5) {
+          const edge = activeEdges[Math.floor(Math.random() * activeEdges.length)];
+          packets.push({
+            fromIdx: edge[0],
+            toIdx: edge[1],
+            progress: 0,
+            speed: 0.014 + Math.random() * 0.016
+          });
         }
 
-        const p1 = particles[pkt.fromIdx];
-        const p2 = particles[pkt.toIdx];
-        if (!p1 || !p2) continue;
+        // Update packets
+        for (let k = packets.length - 1; k >= 0; k--) {
+          const pkt = packets[k];
+          pkt.progress += pkt.speed;
 
-        const curX = p1.x + (p2.x - p1.x) * pkt.progress;
-        const curY = p1.y + (p2.y - p1.y) * pkt.progress;
+          if (pkt.progress >= 1) {
+            packets.splice(k, 1);
+            continue;
+          }
 
-        ctx.beginPath();
-        ctx.arc(curX, curY, 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = dark ? '#FFFFFF' : '#0F172A';
-        ctx.fill();
+          const p1 = particles[pkt.fromIdx];
+          const p2 = particles[pkt.toIdx];
+          if (!p1 || !p2) continue;
+
+          const curX = p1.x + (p2.x - p1.x) * pkt.progress;
+          const curY = p1.y + (p2.y - p1.y) * pkt.progress;
+
+          ctx.beginPath();
+          ctx.arc(curX, curY, 2.2, 0, Math.PI * 2);
+          ctx.fillStyle = dark ? '#FFFFFF' : '#0F172A';
+          ctx.fill();
+        }
       }
 
       // Draw and update particles
@@ -168,15 +186,17 @@ export const CyberBackground: React.FC = () => {
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // Mouse repulsion
-        const mdx = p.x - mouseX;
-        const mdy = p.y - mouseY;
-        const mDistSq = mdx * mdx + mdy * mdy;
-        if (mDistSq < 19600 && mDistSq > 0) {
-          const mDist = Math.sqrt(mDistSq);
-          const force = (140 - mDist) / 140;
-          p.x += (mdx / mDist) * force * 1.5;
-          p.y += (mdy / mDist) * force * 1.5;
+        // Mouse repulsion (desktop only)
+        if (!isMobile) {
+          const mdx = p.x - mouseX;
+          const mdy = p.y - mouseY;
+          const mDistSq = mdx * mdx + mdy * mdy;
+          if (mDistSq < 19600 && mDistSq > 0) {
+            const mDist = Math.sqrt(mDistSq);
+            const force = (140 - mDist) / 140;
+            p.x += (mdx / mDist) * force * 1.5;
+            p.y += (mdy / mDist) * force * 1.5;
+          }
         }
 
         p.pulsePhase += 0.02;
@@ -197,8 +217,11 @@ export const CyberBackground: React.FC = () => {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', handleMouseMove);
+      if (!isMobile) {
+        window.removeEventListener('mousemove', handleMouseMove);
+      }
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 

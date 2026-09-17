@@ -21,6 +21,7 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   const [opacity, setOpacity] = useState(0);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== 'undefined' && !window.matchMedia('(pointer: fine)').matches) return;
     if (!divRef.current) return;
     const rect = divRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -37,6 +38,7 @@ export const SpotlightCard: React.FC<SpotlightCardProps> = ({
   };
 
   const handleMouseEnter = () => {
+    if (typeof window !== 'undefined' && !window.matchMedia('(pointer: fine)').matches) return;
     setOpacity(1);
   };
 
