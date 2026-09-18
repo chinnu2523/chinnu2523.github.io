@@ -101,6 +101,14 @@ React.useEffect(() => {
   }
 }, []);
 
+// Mobile-tuned GPU-accelerated scroll transforms (buttery smooth 60fps, zero-lag)
+const mobilePhotoScale = useTransform(smoothProgress, [0, 0.65], [1, 1.42]);
+const mobilePhotoOpacity = useTransform(smoothProgress, [0, 0.9], [1, 0.95]);
+const mobileOrbitScrollRotate = useTransform(smoothProgress, [0, 1], [0, 180]);
+const mobileOrbitScale = useTransform(smoothProgress, [0, 0.65], [1, 1.3]);
+const mobileBadgeScale = useTransform(smoothProgress, [0, 0.5], [1, 0.92]);
+const mobileHaloScale = useTransform(smoothProgress, [0, 0.65], [1, 1.4]);
+
 const activeLeftWingStyle = isDesktop ? { x: leftWingX, opacity: leftWingOpacity } : undefined;
 const activeRightWingStyle = isDesktop ? { x: rightWingX, opacity: rightWingOpacity } : undefined;
 const activePhotoStyle = isDesktop ? {
@@ -112,15 +120,34 @@ const activePhotoStyle = isDesktop ? {
   y: photoTotalY,
   transformOrigin: '50% 10%',
   transformStyle: 'preserve-3d' as const
-} : undefined;
+} : {
+  scale: mobilePhotoScale,
+  opacity: mobilePhotoOpacity,
+  transformOrigin: '50% 15%',
+  willChange: 'transform'
+};
 const activeBadgeStyle = isDesktop ? {
   x: badgeTranslateX,
   y: badgeTranslateY,
   scale: badgesScale,
   opacity: badgesOpacity
-} : undefined;
-const activeOrbitStyle = isDesktop ? { scale: orbitScale, opacity: orbitOpacity } : undefined;
-const activeHaloStyle = isDesktop ? { scale: haloScale, opacity: haloOpacity } : undefined;
+} : {
+  scale: mobileBadgeScale
+};
+const activeOrbitStyle = isDesktop ? { 
+  scale: orbitScale, 
+  opacity: orbitOpacity 
+} : { 
+  scale: mobileOrbitScale, 
+  opacity: orbitOpacity 
+};
+const activeHaloStyle = isDesktop ? { 
+  scale: haloScale, 
+  opacity: haloOpacity 
+} : { 
+  scale: mobileHaloScale, 
+  opacity: haloOpacity 
+};
 
 const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
   if (!isDesktop) return;
@@ -375,7 +402,7 @@ const itemVariants: Variants = {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 55, repeat: Infinity, ease: 'linear' }}
-                  style={isDesktop ? { rotate: orbitScrollRotate } : undefined}
+                  style={{ rotate: isDesktop ? orbitScrollRotate : mobileOrbitScrollRotate }}
                   className="w-[280px] sm:w-[420px] xl:w-[480px] h-[280px] sm:h-[420px] xl:h-[480px] rounded-full border border-slate-300/80 dark:border-white/15 relative"
                 >
                   {/* Cardinal Orbit Nodes at 0°, 90°, 180°, 270° */}

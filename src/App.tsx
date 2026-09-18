@@ -14,6 +14,9 @@ import { CommandPalette } from './components/CommandPalette';
 import { CyberBackground } from './components/CyberBackground';
 import { CustomCursor } from './components/CustomCursor';
 import { ScrollProgressBeam } from './components/ScrollProgressBeam';
+import { ScrollNavigationDots } from './components/ScrollNavigationDots';
+import { LiveThreatRadar } from './components/LiveThreatRadar';
+import { SecurityPlayground } from './components/SecurityPlayground';
 
 export const AppContent: React.FC = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -43,6 +46,9 @@ export const AppContent: React.FC = () => {
       {/* Liquid Platinum Scroll Progress Hairline Beam */}
       <ScrollProgressBeam />
 
+      {/* Floating Vertical Scroll Navigation Track (Desktop/Laptops) */}
+      <ScrollNavigationDots />
+
       {/* High-Performance Canvas Cyber Background with Data Mesh */}
       <CyberBackground />
 
@@ -64,6 +70,9 @@ export const AppContent: React.FC = () => {
           onScrollToTerminal={scrollToTerminal}
         />
 
+        {/* Real-time Defense Telemetry & Live Threat Radar */}
+        <LiveThreatRadar />
+
         {/* Career Timeline with Verified Milestones */}
         <ExperienceTimeline />
 
@@ -72,6 +81,9 @@ export const AppContent: React.FC = () => {
 
         {/* Interactive CLI Shell */}
         <InteractiveTerminal />
+
+        {/* Hands-on Security Sandbox (OWASP Scanner, Multicloud, ESP32) */}
+        <SecurityPlayground />
 
         {/* Skills & Threat Matrix */}
         <SkillsMatrix />

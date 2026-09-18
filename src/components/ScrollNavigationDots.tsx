@@ -11,10 +11,10 @@ interface SectionInfo {
 const SECTIONS: SectionInfo[] = [
   { id: 'overview', name: 'Overview', latin: 'Apex' },
   { id: 'threat-radar', name: 'Threat Radar', latin: 'Speculum' },
-  { id: 'terminal', name: 'Sovereign CLI', latin: 'Consilium' },
-  { id: 'sandbox', name: 'Security Sandbox', latin: 'Exercitus' },
   { id: 'experience', name: 'Engagements', latin: 'Acta' },
   { id: 'projects', name: 'Dossiers', latin: 'Opera' },
+  { id: 'terminal', name: 'Sovereign CLI', latin: 'Consilium' },
+  { id: 'sandbox', name: 'Security Sandbox', latin: 'Exercitus' },
   { id: 'skills', name: 'Competencies', latin: 'Virtus' },
   { id: 'certifications', name: 'Accolades', latin: 'Insignia' },
   { id: 'contact', name: 'Diplomatic Dispatch', latin: 'Epistula' }
@@ -55,7 +55,7 @@ export const ScrollNavigationDots: React.FC = () => {
   };
 
   return (
-    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden 2xl:flex flex-col items-center space-y-4 pointer-events-auto">
+    <div className="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center space-y-3.5 pointer-events-auto">
       {/* Liquid Platinum Vertical Track Line */}
       <div className="absolute top-2 bottom-2 left-1/2 -translate-x-1/2 w-[1px] bg-gradient-to-b from-transparent via-slate-400/30 dark:via-white/20 to-transparent pointer-events-none" />
 

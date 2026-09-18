@@ -11,6 +11,7 @@ import { CERTIFICATIONS, EDUCATION, CertificationItem } from '../data/portfolioD
 import { sounds } from '../utils/soundEffects';
 import { MotionSection } from './MotionSection';
 import { SpotlightCard } from './SpotlightCard';
+import { RoyalSeal } from './RoyalSeal';
 
 export const CertificationsVault: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string>('All');
@@ -111,12 +112,26 @@ export const CertificationsVault: React.FC = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* Academic Foundation Section */}
-      <div className="pt-8 border-t border-slate-200 dark:border-white/15">
-        <div className="flex items-center space-x-2 text-slate-900 dark:text-white font-royal font-bold text-xl mb-6">
-          <GraduationCap className="w-5 h-5 text-slate-900 dark:text-white" />
-          <span>Academic Distinction & Foundation</span>
+      {/* Academic Foundation & Attestation Section */}
+      <div className="pt-12 border-t border-slate-200 dark:border-white/15 flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <div className="space-y-1.5 text-center md:text-left">
+          <div className="flex items-center justify-center md:justify-start space-x-2 text-slate-900 dark:text-white font-cinzel font-bold text-xl">
+            <GraduationCap className="w-5 h-5 text-slate-900 dark:text-white" />
+            <span>Academic Distinction &amp; Cryptographic Attestation</span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-300 font-sans max-w-xl">
+            Verified degree attainment from KL University with 8.7 CGPA (Distinction). Attested with sovereign cryptographic seal.
+          </p>
         </div>
+
+        {/* 3D Interactive Royal Seal */}
+        <div className="flex flex-col items-center shrink-0">
+          <RoyalSeal />
+          <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 mt-2 tracking-widest uppercase">
+            3D Sovereign Seal (Interactive)
+          </span>
+        </div>
+      </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {EDUCATION.map((edu, idx) => (
@@ -148,7 +163,6 @@ export const CertificationsVault: React.FC = () => {
             </motion.div>
           ))}
         </div>
-      </div>
 
       {/* Credential Inspection Modal */}
       <AnimatePresence>
