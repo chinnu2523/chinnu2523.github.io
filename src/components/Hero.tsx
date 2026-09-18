@@ -377,7 +377,7 @@ const itemVariants: Variants = {
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.1, ease: LUXURY_EASE }}
-              className="col-span-1 lg:col-span-4 relative flex justify-center items-center perspective-1000 select-none my-6 lg:my-0 z-10"
+              className="col-span-1 lg:col-span-4 relative flex justify-center items-center perspective-1000 select-none my-8 mb-14 lg:my-0 z-10"
             >
               {/* Soft Ambient Breathing Backing Behind Subject */}
               <motion.div 
@@ -451,7 +451,7 @@ const itemVariants: Variants = {
                   style={activeBadgeStyle}
                   animate={{ y: [-3, 3, -3] }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute -top-2 -right-2 sm:-right-4 px-3 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 flex items-center space-x-2"
+                  className="absolute -top-2 right-0 sm:-right-4 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 flex items-center space-x-1.5 sm:space-x-2"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-slate-900 dark:text-white" />
                   <span className="font-mono text-[10px] text-slate-900 dark:text-white font-bold tracking-wider">8.7 CGPA</span>
@@ -463,7 +463,7 @@ const itemVariants: Variants = {
                   style={activeBadgeStyle}
                   animate={{ y: [3, -3, 3] }}
                   transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute -bottom-2 -left-2 sm:-left-4 px-3 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 flex items-center space-x-2"
+                  className="hidden sm:flex absolute -bottom-2 -left-2 sm:-left-4 px-3 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 items-center space-x-2"
                 >
                   <Cloud className="w-3.5 h-3.5 text-slate-900 dark:text-white" />
                   <span className="font-mono text-[10px] text-slate-900 dark:text-white font-bold tracking-wider">AVIATRIX ACE</span>
@@ -474,7 +474,7 @@ const itemVariants: Variants = {
                   style={activeBadgeStyle}
                   animate={{ y: [-2, 2, -2] }}
                   transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 whitespace-nowrap"
+                  className="hidden sm:flex absolute bottom-4 left-1/2 -translate-x-1/2 items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/95 dark:bg-black/90 border border-slate-300 dark:border-white/30 backdrop-blur-xl shadow-xl z-30 whitespace-nowrap"
                 >
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-900 dark:bg-white opacity-75" />
